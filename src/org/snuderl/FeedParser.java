@@ -14,11 +14,12 @@ import android.sax.RootElement;
 import android.util.Xml;
 
 public class FeedParser {
-	static final String PUB_DATE = "pubDate";
+	static final String PUB_DATE = "a10:updated";
 	static final String DESCRIPTION = "description";
 	static final String LINK = "link";
 	static final String TITLE = "title";
 	static final String ITEM = "item";
+	static final String ID = "guid";
 
 	final URL feedUrl;
 
@@ -50,7 +51,12 @@ public class FeedParser {
 				messages.add(currentMessage.copy());
 			}
 		});
-
+		item.getChild(ID).setEndTextElementListener(
+				new EndTextElementListener() {
+					public void end(String body) {
+						currentMessage.id = (body);
+					}
+				});
 		item.getChild(TITLE).setEndTextElementListener(
 				new EndTextElementListener() {
 					public void end(String body) {

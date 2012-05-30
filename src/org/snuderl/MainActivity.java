@@ -17,6 +17,8 @@ public class MainActivity extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		final PortalApi api = new PortalApi("1");
 
 //		NewsMessage m = new NewsMessage();
 //		m.Title = "a";
@@ -35,9 +37,16 @@ public class MainActivity extends ListActivity {
 		lv.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
+				
+				String result = "";
+				try {
+					result = api.ReportClick(adapter.get(position).id);
+				} catch (Exception e) {
+					result = "error reporting click";
+				}
 				// When clicked, show a toast with the TextView text
 				Toast.makeText(MainActivity.this,
-						adapter.get(position).Short,
+						result,
 						Toast.LENGTH_SHORT).show();
 			}
 		});
