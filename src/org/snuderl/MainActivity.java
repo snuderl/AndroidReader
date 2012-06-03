@@ -3,6 +3,8 @@ package org.snuderl;
 import java.util.List;
 
 import android.app.*;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import android.view.Menu;
@@ -12,12 +14,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends ListActivity {
 	FeedParser parser = new FeedParser("http://mobilniportalnovic.apphb.com/feed");
-	final PortalApi api = new PortalApi("1");
+	final PortalApi api = new PortalApi();
 	NewsAdapter adapter= null;
 	
 	/** Called when the activity is first created. */
@@ -25,6 +26,8 @@ public class MainActivity extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		final SharedPreferences settings  = getSharedPreferences("org.snuderl.settings", 2);
+		settings.edit().commit();
 		
 		List<NewsMessage> list = parser.parse();
 		adapter = new NewsAdapter(this, list);
@@ -39,7 +42,7 @@ public class MainActivity extends ListActivity {
 				
 				String result = "";
 				try {
-					result = api.ReportClick(adapter.get(position).id);
+					result = api.ReportClick(adapter.get(position).id, settings.getString("userId", "1"));
 				} catch (Exception e) {
 					result = "error reporting click";
 				}
@@ -67,6 +70,9 @@ public class MainActivity extends ListActivity {
 					adapter.add(nm);
 				}
 	            return true;
+	        case R.id.settingsButton:
+	        	Intent i = new Intent(MainActivity.this, SettingsActivity.class);
+	        	MainActivity.this.startActivity(i);
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }

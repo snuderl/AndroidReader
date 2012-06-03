@@ -13,13 +13,8 @@ import android.util.Log;
 public class PortalApi {
 	public final String host = "http://mobilniportalnovic.apphb.com/feed";
 	public final String Click = "Click";
-	public final String userId;
 
-	public PortalApi(String userId) {
-		this.userId = userId;
-	}
-
-	public String ReportClick(String NewsId) throws Exception {
+	public String ReportClick(String NewsId, String userId) throws Exception {
 		RestClient client = new RestClient(host + "/" + Click);
 		client.AddParam("NewsId", NewsId);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
