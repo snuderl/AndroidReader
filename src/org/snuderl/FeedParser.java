@@ -24,9 +24,11 @@ public class FeedParser {
 	private int page = 0;
 
 	final String feedUrl;
+	final String userId;
 
-	protected FeedParser(String feedUrl) {
+	protected FeedParser(String feedUrl, String userId) {
 		this.feedUrl = feedUrl;
+		this.userId = userId;
 	}
 
 	protected InputStream getInputStream(String uri) {
@@ -39,12 +41,12 @@ public class FeedParser {
 
 	public List<NewsMessage> more() {
 		page = page + 1;
-		String url = feedUrl + "?" + "page" + "=" + page;
+		String url = feedUrl + "?" + "page" + "=" + page + "&userId=" + userId;
 		return parse(url);
 	}
 
 	public List<NewsMessage> parse() {
-		return parse(feedUrl);
+		return parse(feedUrl + "?" + "userId=" + userId);
 	}
 
 	public List<NewsMessage> parse(String URI) {

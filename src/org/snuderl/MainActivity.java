@@ -19,8 +19,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class MainActivity extends ListActivity {
-	FeedParser parser = new FeedParser(
-			"http://mobilniportalnovic.apphb.com/feed");
+	FeedParser parser = null;
 	final PortalApi api = new PortalApi();
 	NewsAdapter adapter = null;
 
@@ -32,6 +31,9 @@ public class MainActivity extends ListActivity {
 		final SharedPreferences settings = getSharedPreferences(
 				"org.snuderl.settings", 2);
 		settings.edit().commit();
+		
+		parser = new FeedParser(
+				"http://mobilniportalnovic.apphb.com/feed", settings.getString("userId", "1"));
 
 		List<NewsMessage> list = parser.parse();
 		adapter = new NewsAdapter(this, list);
