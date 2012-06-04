@@ -62,7 +62,7 @@ public class FeedParser {
 		item.getChild(ID).setEndTextElementListener(
 				new EndTextElementListener() {
 					public void end(String body) {
-						currentMessage.id = (body);
+						currentMessage.Id = (body);
 					}
 				});
 		item.getChild(TITLE).setEndTextElementListener(
@@ -74,7 +74,7 @@ public class FeedParser {
 		item.getChild(LINK).setEndTextElementListener(
 				new EndTextElementListener() {
 					public void end(String body) {
-						currentMessage.link = (body);
+						currentMessage.Link = (body);
 					}
 				});
 		item.getChild(DESCRIPTION).setEndTextElementListener(

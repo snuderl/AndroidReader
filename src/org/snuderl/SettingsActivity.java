@@ -15,10 +15,13 @@ public class SettingsActivity extends Activity {
 	
 	EditText et = null;
 	SharedPreferences settings;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.settings);
+		
+		
 		
 		settings  = getSharedPreferences("org.snuderl.settings", 0);
 		

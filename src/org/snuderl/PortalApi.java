@@ -4,9 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.snuderl.RestClient.RequestMethod;
 
 import android.util.Log;
 
@@ -22,20 +20,38 @@ public class PortalApi {
 		client.AddParam("ClickDate", dateFormat.format(date));
 		client.AddParam("UserId", userId);
 		client.AddParam("Location", "null");
-		client.Execute(RequestMethod.POST);
+		client.Execute(RestClient.RequestMethod.POST);
 		return client.getResponse();
 	}
 
 	public void LoadNews(NewsMessage news) {
-		RestClient client = new RestClient(news.link);
-		String response = client.getResponse();
+		RestClient client = new RestClient(news.Link);
 		try {
-			JSONObject object = new JSONObject(response);
-			news.Category=object.getString("category");
-			news.Content = object.getString("content");
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
+			client.Execute(RestClient.RequestMethod.GET);
+		} catch (Exception e) {
+			Log.e("LoadNews", "Error getting news Json");
 			e.printStackTrace();
+		}
+
+		String response = client.getResponse();
+		if (response != null) {
+			try {
+
+				JSONObject o = new JSONObject(response);
+
+				news.Content = o.getString("Content");
+				news.Category = o.getString("Category");
+//				String date = o.getString("PubDate");
+//				Date d = new Date(date);
+//				SimpleDateFormat f = new SimpleDateFormat();
+//				news.Date = f.format(d);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		} else {
+			Log.e("LoadNews", "EmptyResponse");
 		}
 	}
 
