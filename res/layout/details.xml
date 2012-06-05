@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-
+
     <TextView
         android:id="@+id/detailsTitle"
         android:layout_width="wrap_content"
@@ -10,31 +10,36 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:text="TextView" />
-
+        android:text="TextView"
+        android:textColor="#ff0000"
+        android:textSize="19sp" />
+
+    <TextView
+        android:id="@+id/detailsPubDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/detailsTitle"
+        android:text="TextViewfggfggf"
+        android:textSize="10sp" />
+
     <TextView
         android:id="@+id/detailsCategory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/detailsTitle"
-        android:text="TextView" />
-
+        android:text="TextViewfggfggf"
+        android:textColor="#00FF00"
+        android:textSize="10sp" />
+
     <TextView
         android:id="@+id/detailsContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/detailsCategory"
-        android:text="TextView" />
-
-    <TextView
-        android:id="@+id/detailsPubDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/textView1"
-        android:layout_alignParentRight="true"
-        android:text="TextView" />
+        android:layout_below="@+id/detailsPubDate"
+        android:layout_marginTop="15dp"
+        android:text="TextViewfggfggfTextViewfggfggfTextViewfggfggf" />
 
 </RelativeLayout>

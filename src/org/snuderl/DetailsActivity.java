@@ -1,6 +1,7 @@
 package org.snuderl;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -22,8 +23,10 @@ public class DetailsActivity extends Activity{
 		
 		title.setText(news.Title);
 		pubDate.setText(news.Date);
-		Category.setText(news.Category);
-		content.setText(news.Content);
+		
+		//Zamenjano. WTF
+		Category.setText(news.Content);
+		content.setText(news.Category);
 		
 		
 	}
