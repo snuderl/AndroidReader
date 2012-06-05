@@ -2,8 +2,6 @@ package org.snuderl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +13,7 @@ import android.sax.RootElement;
 import android.util.Xml;
 
 public class FeedParser {
-	static final String PUB_DATE = "a10:updated";
+	static final String PUB_DATE = "pubDate";
 	static final String DESCRIPTION = "description";
 	static final String LINK = "link";
 	static final String TITLE = "title";
