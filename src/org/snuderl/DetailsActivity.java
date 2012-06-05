@@ -25,8 +25,8 @@ public class DetailsActivity extends Activity{
 		pubDate.setText(news.Date);
 		
 		//Zamenjano. WTF
-		Category.setText(news.Content);
-		content.setText(news.Category);
+		Category.setText(news.Category);
+		content.setText(news.Content);
 		
 		
 	}
