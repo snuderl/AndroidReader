@@ -22,18 +22,25 @@ public class MainActivity extends ListActivity {
 	FeedParser parser = null;
 	final PortalApi api = new PortalApi();
 	NewsAdapter adapter = null;
+	String userId = "";
+	Boolean all = false;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		final SharedPreferences settings = getSharedPreferences(
-				"org.snuderl.settings", 2);
-		settings.edit().commit();
-		
-		parser = new FeedParser(
-				"http://mobilniportalnovic.apphb.com/feed", settings.getString("userId", "1"));
+		userId = getIntent().getExtras().getString("userId");
+		all = getIntent().getExtras().getBoolean("all");
+
+		if(!all){
+		parser = new FeedParser("http://mobilniportalnovic.apphb.com/feed",
+				userId);
+		}
+		else{
+			parser = new FeedParser("http://mobilniportalnovic.apphb.com/feed",
+					"0");
+		}
 
 		List<NewsMessage> list = parser.parse();
 		adapter = new NewsAdapter(this, list);
@@ -63,11 +70,12 @@ public class MainActivity extends ListActivity {
 				api.LoadNews(m);
 
 				State.getState().selected = m;
-				
-				AsyncTask<Click, Void, Void> report = new ClickCounter();
-				report.execute(new Click(m.Id, settings.getString("userId", "1")));
 
-				Intent details = new Intent(MainActivity.this, DetailsActivity.class);
+				AsyncTask<Click, Void, Void> report = new ClickCounter();
+				report.execute(new Click(m.Id, userId));
+
+				Intent details = new Intent(MainActivity.this,
+						DetailsActivity.class);
 				startActivity(details);
 			}
 		});
@@ -108,7 +116,7 @@ class Click {
 	}
 }
 
-class ClickCounter extends AsyncTask<Click, Void, Void>{
+class ClickCounter extends AsyncTask<Click, Void, Void> {
 	@Override
 	protected Void doInBackground(Click... params) {
 		PortalApi api = new PortalApi();
