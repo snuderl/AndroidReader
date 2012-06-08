@@ -40,7 +40,7 @@
             android:textColor="#00FF00"
             android:textSize="10sp" />
 
-        <TextView
+        <WebView
             android:id="@+id/detailsContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -48,6 +48,7 @@
             android:layout_below="@+id/detailsPubDate"
             android:layout_marginTop="15dp"
             android:text="TextViewfggfggfTextViewfggfggfTextViewfggfggf" />
+
     </RelativeLayout>
 
 </ScrollView>
