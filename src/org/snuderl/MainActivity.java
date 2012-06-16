@@ -3,12 +3,18 @@ package org.snuderl;
 import java.util.List;
 
 import android.app.*;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -16,6 +22,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 public class MainActivity extends ListActivity {
@@ -24,6 +31,7 @@ public class MainActivity extends ListActivity {
 	NewsAdapter adapter = null;
 	String userId = "";
 	Boolean all = false;
+	int checked = -1;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -33,11 +41,10 @@ public class MainActivity extends ListActivity {
 		userId = getIntent().getExtras().getString("userId");
 		all = getIntent().getExtras().getBoolean("all");
 
-		if(!all){
-		parser = new FeedParser("http://mobilniportalnovic.apphb.com/feed",
-				userId);
-		}
-		else{
+		if (!all) {
+			parser = new FeedParser("http://mobilniportalnovic.apphb.com/feed",
+					userId);
+		} else {
 			parser = new FeedParser("http://mobilniportalnovic.apphb.com/feed",
 					"0");
 		}
@@ -66,7 +73,7 @@ public class MainActivity extends ListActivity {
 				// Toast.makeText(MainActivity.this,
 				// result,
 				// Toast.LENGTH_SHORT).show();
-				NewsMessage m = adapter.get(position);
+				NewsMessage m = adapter.getItem(position);
 				api.LoadNews(m);
 
 				State.getState().selected = m;
@@ -100,6 +107,33 @@ public class MainActivity extends ListActivity {
 		case R.id.settingsButton:
 			Intent i = new Intent(MainActivity.this, SettingsActivity.class);
 			MainActivity.this.startActivity(i);
+
+			return true;
+		case R.id.choseCategory:
+			final CharSequence[] items = ApplicationState.GetApplicationState()
+					.Categories();
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle("Pick a color");
+			builder.setSingleChoiceItems(items, checked, new OnClickListener() {
+
+				public void onClick(DialogInterface dialog, int which) {
+					checked = which;
+
+				}
+			});
+			builder.setPositiveButton("Filter", new OnClickListener() {
+
+				public void onClick(DialogInterface dialog, int which) {
+					
+					dialog.cancel();
+					getListView().setFilterText(items[checked].toString());
+					getListView().setTextFilterEnabled(true);
+				}
+			});
+			AlertDialog alert = builder.create();
+			alert.show();
+			
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}

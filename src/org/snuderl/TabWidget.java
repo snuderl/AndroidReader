@@ -14,6 +14,13 @@ public class TabWidget extends TabActivity {
 		
 		final SharedPreferences settings = getSharedPreferences(
 				"org.snuderl.settings", 2);
+		final ApplicationState state = ApplicationState.GetApplicationState();
+		try{
+		state.Categories = Category.GetCategories();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
 
 		settings.edit().putString("userId", "0");
 		settings.edit().commit();

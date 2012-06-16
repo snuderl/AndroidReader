@@ -19,6 +19,7 @@ public class FeedParser {
 	static final String TITLE = "title";
 	static final String ITEM = "item";
 	static final String ID = "guid";
+	static final String CATEGORY = "category";
 	private int page = 0;
 
 	final String feedUrl;
@@ -89,6 +90,12 @@ public class FeedParser {
 						currentMessage.Date = (body);
 					}
 				});
+		item.getChild(CATEGORY).setEndTextElementListener(new EndTextElementListener() {
+			
+			public void end(String body) {
+				currentMessage.Category=(body);				
+			}
+		});
 		try {
 			Xml.parse(this.getInputStream(URI), Xml.Encoding.UTF_8,
 					root.getContentHandler());
