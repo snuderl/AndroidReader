@@ -3,6 +3,7 @@ package org.snuderl;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public class ApplicationState {
 
 	public String GetParent(String child) {
 		if (ChildToParent == null) {
-			ChildToParent = new HashMap<String, String>();
+			ChildToParent = new LinkedHashMap<String, String>();
 			for (Category p :Categories ) {
 				for(Category c : p.Children){
 					ChildToParent.put(c.Name, p.Name);

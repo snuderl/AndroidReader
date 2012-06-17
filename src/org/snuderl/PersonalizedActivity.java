@@ -1,39 +1,29 @@
 package org.snuderl;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.snuderl.click.Click;
 import org.snuderl.click.ClickCounter;
 
-import android.app.*;
-import android.content.Context;
+import android.app.AlertDialog;
+import android.app.ListActivity;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
-import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.DialogInterface.OnClickListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
-
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
-public class MainActivity extends ListActivity {
+public class PersonalizedActivity extends ListActivity {
 	FeedParser parser = null;
 	final PortalApi api = new PortalApi();
 	NewsAdapter adapter = null;
@@ -55,16 +45,16 @@ public class MainActivity extends ListActivity {
 		all = getIntent().getExtras().getBoolean("all");
 
 		parser = new FeedParser("http://mobilniportalnovic.apphb.com/feed");
+		parser.AddParameter("userId", userId);
 
 		List<NewsMessage> list = parser.parse();
 		adapter = new NewsAdapter(this, list);
 		setListAdapter(adapter);
 
-		this.getListView().setOnItemClickListener(GetItemClickListener());
-	}
+		lv = getListView();
+		lv.setTextFilterEnabled(true);
 
-	public OnItemClickListener GetItemClickListener() {
-		return new OnItemClickListener() {
+		lv.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
@@ -76,11 +66,11 @@ public class MainActivity extends ListActivity {
 				AsyncTask<Click, Void, Void> report = new ClickCounter();
 				report.execute(new Click(m.Id, userId));
 
-				Intent details = new Intent(MainActivity.this,
+				Intent details = new Intent(PersonalizedActivity.this,
 						DetailsActivity.class);
 				startActivity(details);
 			}
-		};
+		});
 	}
 
 	@Override
@@ -99,47 +89,56 @@ public class MainActivity extends ListActivity {
 				adapter.add(nm);
 			}
 			adapter.notifyDataSetChanged();
+			lv.clearTextFilter();
+			if (checked > 0) {
+				lv.setFilterText(filters[checked].toString());
+			}
 			return true;
 		case R.id.settingsButton:
-			Intent i = new Intent(MainActivity.this, SettingsActivity.class);
-			MainActivity.this.startActivity(i);
+			Intent i = new Intent(PersonalizedActivity.this,
+					SettingsActivity.class);
+			PersonalizedActivity.this.startActivity(i);
 
 			return true;
 		case R.id.choseCategory:
-
-			items = ApplicationState.GetApplicationState().Categories();
+			if (!all) {
+				LinkedHashMap<String, Integer> map = adapter.GetCategories();
+				List<String> tmp = new ArrayList<String>();
+				for (String key : map.keySet()) {
+					tmp.add(key + " (" + map.get(key) + ")");
+				}
+				items = new String[map.size()];
+				filters = new String[map.size()];
+				tmp.toArray(items);
+				map.keySet().toArray(filters);
+			} else {
+				items = ApplicationState.GetApplicationState().Categories();
+				filters = items;
+			}
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("Choose category:");
+			builder.setTitle("Pick a color");
 			builder.setSingleChoiceItems(items, checked, new OnClickListener() {
 
 				public void onClick(DialogInterface dialog, int which) {
 					checked = which;
 				}
 			});
-			builder.setPositiveButton("Show category", new OnClickListener() {
+			builder.setPositiveButton("Filter", new OnClickListener() {
 
 				public void onClick(DialogInterface dialog, int which) {
-					int CategoryId = ApplicationState.GetApplicationState().Categories[checked].Id;
-					parser = new FeedParser(
-							"http://mobilniportalnovic.apphb.com/Feed/CategoryView/"
-									+ CategoryId);
-					adapter.clear();
-					for (NewsMessage nm : parser.parse()) {
-						adapter.add(nm);
-					}
+
+					dialog.cancel();
+					getListView().setFilterText(filters[checked].toString());
+					getListView().setTextFilterEnabled(true);
 				}
 			});
-			builder.setNegativeButton("Show all", new OnClickListener() {
+			builder.setNegativeButton("Disable filter", new OnClickListener() {
 
 				public void onClick(DialogInterface dialog, int which) {
-					parser = new FeedParser(
-							"http://mobilniportalnovic.apphb.com/feed");
-					adapter.clear();
-					for (NewsMessage nm : parser.parse()) {
-						adapter.add(nm);
-					}
-					Toast.makeText(MainActivity.this, "Displaying all",
-							Toast.LENGTH_SHORT);
+					checked=-1;
+					getListView().clearTextFilter();
+					Toast.makeText(PersonalizedActivity.this,
+							"Filtering disabled", Toast.LENGTH_SHORT);
 				}
 			});
 			AlertDialog alert = builder.create();

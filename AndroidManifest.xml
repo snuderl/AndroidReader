@@ -25,6 +25,7 @@
         <activity android:name="DetailsActivity"></activity>
         <activity android:name=".MainActivity"></activity>
         <activity android:name="CategoryActivity"></activity>
+        <activity android:name="PersonalizedActivity"></activity>
     </application>
 
 </manifest>

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.sax.Element;
@@ -23,11 +24,14 @@ public class FeedParser {
 	private int page = 0;
 
 	final String feedUrl;
-	final String userId;
+	HashMap<String,String> parameters = new HashMap<String,String>();
 
-	protected FeedParser(String feedUrl, String userId) {
+	protected FeedParser(String feedUrl) {
 		this.feedUrl = feedUrl;
-		this.userId = userId;
+	}
+	
+	public void AddParameter(String key,String value){
+		parameters.put(key,value);
 	}
 
 	protected InputStream getInputStream(String uri) {
@@ -39,14 +43,43 @@ public class FeedParser {
 	}
 
 	public List<NewsMessage> more() {
+		StringBuilder url = new StringBuilder();
+		url.append(feedUrl);
+		url.append("?");
+		int count = 0;
+		for(String key : parameters.keySet()){
+			url.append(key);
+			url.append("=");
+			url.append(parameters.get(key));
+			count++;
+			if(count<parameters.size()){
+				url.append("&");
+			}
+		}
 		page = page + 1;
-		String url = feedUrl + "?" + "page" + "=" + page + "&userId=" + userId;
-		return parse(url);
+		return parse(url.append("&page="+page).toString());
 	}
 
 	public List<NewsMessage> parse() {
-		return parse(feedUrl + "?" + "userId=" + userId);
+		StringBuilder url = new StringBuilder();
+		url.append(feedUrl);
+		url.append("?");
+		int count = 0;
+		for(String key : parameters.keySet()){
+			url.append(key);
+			url.append("=");
+			url.append(parameters.get(key));
+			count++;
+			if(count<parameters.size()){
+				url.append("&");
+			}
+		}
+		
+		
+		return parse(url.toString());
 	}
+	
+
 
 	public List<NewsMessage> parse(String URI) {
 
