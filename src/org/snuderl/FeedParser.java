@@ -3,7 +3,11 @@ package org.snuderl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -11,6 +15,8 @@ import android.sax.Element;
 import android.sax.EndElementListener;
 import android.sax.EndTextElementListener;
 import android.sax.RootElement;
+import android.test.IsolatedContext;
+import android.text.format.DateFormat;
 import android.util.Xml;
 
 public class FeedParser {
@@ -21,6 +27,7 @@ public class FeedParser {
 	static final String ITEM = "item";
 	static final String ID = "guid";
 	static final String CATEGORY = "category";
+	private String lastDate = null;
 	private int page = 0;
 
 	final String feedUrl;
@@ -56,8 +63,11 @@ public class FeedParser {
 				url.append("&");
 			}
 		}
-		page = page + 1;
-		return parse(url.append("&page="+page).toString());
+		if(lastDate!=null){
+			url.append("&lastDate=" + URLEncoder.encode(lastDate));
+		}
+		
+		return parse(url.toString());
 	}
 
 	public List<NewsMessage> parse() {
@@ -121,8 +131,10 @@ public class FeedParser {
 				new EndTextElementListener() {
 					public void end(String body) {
 						currentMessage.Date = (body);
+						lastDate = body;
 					}
 				});
+				
 		item.getChild(CATEGORY).setEndTextElementListener(new EndTextElementListener() {
 			
 			public void end(String body) {
