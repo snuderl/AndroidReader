@@ -1,7 +1,12 @@
 package org.snuderl;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import android.content.Context;
@@ -16,7 +21,6 @@ public class NewsAdapter extends ArrayAdapter<NewsMessage> {
 	private final Context context;
 	private final List<NewsMessage> values;
 	private boolean[] allowedCategories;
-	private String[] categories;
 	
 	private List<NewsMessage> news;
 
@@ -48,7 +52,23 @@ public class NewsAdapter extends ArrayAdapter<NewsMessage> {
 		return rowView;
 	}
 	
-	public NewsMessage get(int position){
-		return values.get(position);
+	public LinkedHashMap<String, Integer> GetCategories(){
+		LinkedHashMap<String,Integer> map = new LinkedHashMap<String, Integer>();
+		for(NewsMessage nm : this.values){
+			if(map.containsKey(nm.toString())){
+				map.put(nm.toString(), map.get(nm.toString())+1);				
+			}
+			else{
+				map.put(nm.toString(), 1);
+			}
+		}
+		return map;
+	}
+	
+	
+	@Override
+	public void add(NewsMessage object) {
+		values.add(object);
+		super.add(object);
 	}
 }

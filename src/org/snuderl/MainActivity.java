@@ -1,6 +1,11 @@
 package org.snuderl;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import android.app.*;
 import android.content.Context;
@@ -33,6 +38,10 @@ public class MainActivity extends ListActivity {
 	Boolean all = false;
 	int checked = -1;
 
+	CharSequence[] items;
+	CharSequence[] filters;
+	
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -60,19 +69,6 @@ public class MainActivity extends ListActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
-				// String result = "";
-				// try {
-				// result = api.ReportClick(adapter.get(position).id,
-				// settings.getString("userId", "1"));
-				// } catch (Exception e) {
-				// result = "error reporting click";
-				// }
-				//
-				//
-				// // When clicked, show a toast with the TextView text
-				// Toast.makeText(MainActivity.this,
-				// result,
-				// Toast.LENGTH_SHORT).show();
 				NewsMessage m = adapter.getItem(position);
 				api.LoadNews(m);
 
@@ -110,15 +106,28 @@ public class MainActivity extends ListActivity {
 
 			return true;
 		case R.id.choseCategory:
-			final CharSequence[] items = ApplicationState.GetApplicationState()
-					.Categories();
+			if(!all){
+				LinkedHashMap<String, Integer> map= adapter.GetCategories();
+				List<String> tmp = new ArrayList<String>();
+				for(String key: map.keySet()){
+					tmp.add(key + " ("+map.get(key)+")");
+				}
+				items = new String[map.size()];
+				filters = new String[map.size()];
+				tmp.toArray(items);
+				map.keySet().toArray(filters);
+			}
+			else{
+				items = ApplicationState.GetApplicationState()
+						.Categories();
+				filters=items;
+			}
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("Pick a color");
 			builder.setSingleChoiceItems(items, checked, new OnClickListener() {
 
-				public void onClick(DialogInterface dialog, int which) {
-					checked = which;
-
+				public void onClick(DialogInterface dialog, int which){
+					checked=which;
 				}
 			});
 			builder.setPositiveButton("Filter", new OnClickListener() {
@@ -126,8 +135,15 @@ public class MainActivity extends ListActivity {
 				public void onClick(DialogInterface dialog, int which) {
 					
 					dialog.cancel();
-					getListView().setFilterText(items[checked].toString());
+					getListView().setFilterText(filters[checked].toString());
 					getListView().setTextFilterEnabled(true);
+				}
+			});
+			builder.setNegativeButton("Disable filter", new OnClickListener() {
+				
+				public void onClick(DialogInterface dialog, int which) {
+					getListView().clearTextFilter();
+					Toast.makeText(MainActivity.this, "Filtering disabled", Toast.LENGTH_SHORT);
 				}
 			});
 			AlertDialog alert = builder.create();
