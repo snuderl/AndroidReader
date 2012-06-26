@@ -68,7 +68,6 @@ public class NewsAdapter extends ArrayAdapter<NewsMessage> {
 	
 	@Override
 	public void add(NewsMessage object) {
-		values.add(object);
 		super.add(object);
 	}
 }

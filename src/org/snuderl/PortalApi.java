@@ -6,11 +6,16 @@ import java.util.Date;
 
 import org.json.JSONObject;
 
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.util.Log;
 
 public class PortalApi {
 	public final String host = "http://mobilniportalnovic.apphb.com/feed";
 	public final String Click = "Click";
+	private final ApplicationState state = ApplicationState
+			.GetApplicationState();
 
 	public String ReportClick(String NewsId, String userId) throws Exception {
 		RestClient client = new RestClient(host + "/" + Click);
@@ -19,9 +24,24 @@ public class PortalApi {
 		Date date = new Date();
 		client.AddParam("ClickDate", dateFormat.format(date));
 		client.AddParam("UserId", userId);
-		client.AddParam("Location", "null");
+		client.AddParam("Location", GetLocation());
 		client.Execute(RestClient.RequestMethod.POST);
 		return client.getResponse();
+	}
+
+	public String GetLocation() {
+		Location l = state.Location;
+		String s;
+		if (l == null) {
+			s = "null";
+		} else {
+			s = l.getLongitude() + "|" + l.getLatitude();
+
+		}
+
+		Log.d("Location", s);
+		return s;
+
 	}
 
 	public void LoadNews(NewsMessage news) {
@@ -41,10 +61,10 @@ public class PortalApi {
 
 				news.Content = o.getString("Content");
 				news.Category = o.getString("Category");
-//				String date = o.getString("PubDate");
-//				Date d = new Date(date);
-//				SimpleDateFormat f = new SimpleDateFormat();
-//				news.Date = f.format(d);
+				// String date = o.getString("PubDate");
+				// Date d = new Date(date);
+				// SimpleDateFormat f = new SimpleDateFormat();
+				// news.Date = f.format(d);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

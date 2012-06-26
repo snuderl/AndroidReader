@@ -7,9 +7,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+
 public class ApplicationState {
 	public Category[] Categories;
 	private Map<String, String> ChildToParent = null;
+	public Location Location = null;
 
 	public CharSequence[] Categories() {
 		CharSequence[] sequence = new CharSequence[Categories.length];
@@ -21,8 +27,7 @@ public class ApplicationState {
 
 	private static ApplicationState singleton = null;
 
-	private ApplicationState() {
-	}
+	private ApplicationState() {	}
 
 	public static ApplicationState GetApplicationState() {
 		if (singleton == null)
@@ -42,4 +47,6 @@ public class ApplicationState {
 
 		return ChildToParent.get(child);
 	}
+	
+	
 }
