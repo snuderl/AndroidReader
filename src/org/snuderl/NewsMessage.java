@@ -12,6 +12,7 @@ public class NewsMessage {
 	public String Link;
 	public String Content;
 	public String ParentCategory = null;
+	public java.util.Date PubDate;
 
 	public NewsMessage copy() {
 		NewsMessage m = new NewsMessage();

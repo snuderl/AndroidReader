@@ -52,6 +52,7 @@ public class PersonalizedActivity extends ListActivity {
 
 		List<NewsMessage> list = parser.parse();
 		adapter = new NewsAdapter(this, list);
+		adapter.Sort();
 		setListAdapter(adapter);
 
 		lv = getListView();
