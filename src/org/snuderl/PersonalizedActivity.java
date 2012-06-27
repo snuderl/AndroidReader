@@ -8,7 +8,9 @@ import org.snuderl.click.Click;
 import org.snuderl.click.ClickCounter;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
@@ -20,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -59,7 +62,13 @@ public class PersonalizedActivity extends ListActivity {
 					int position, long id) {
 
 				NewsMessage m = adapter.getItem(position);
-				api.LoadNews(m);
+				///If content is loaded already, there is no need to load it again, or to report it as a click
+				if (m.Content == null) {
+					api.LoadNews(m);
+
+					AsyncTask<Click, Void, Void> report = new ClickCounter();
+					report.execute(new Click(m.Id, userId));
+				}
 
 				State.getState().selected = m;
 
@@ -76,7 +85,7 @@ public class PersonalizedActivity extends ListActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.menu, menu);
+		inflater.inflate(R.menu.menu_personalized, menu);
 		return true;
 	}
 
@@ -144,6 +153,31 @@ public class PersonalizedActivity extends ListActivity {
 			AlertDialog alert = builder.create();
 			alert.show();
 
+			return true;
+
+		case R.id.recreate:
+			parser = new FeedParser("http://mobilniportalnovic.apphb.com/feed");
+			parser.AddParameter("userId", userId);
+			
+			adapter.clear();
+			adapter = new NewsAdapter(this, parser.parse());
+			setListAdapter(adapter);
+			lv.setAdapter(adapter);
+			
+			return true;
+		case R.id.info:
+			Dialog dialog = new Dialog(PersonalizedActivity.this);
+
+			dialog.setContentView(R.layout.filters_dialog);
+			dialog.setTitle("Custom Dialog");
+
+			TextView text = (TextView) dialog.findViewById(R.id.filterInfo);
+			StringBuilder sb = new StringBuilder();
+			for(String s : parser.FilterInfo){
+				sb.append(s+"\n");
+			}
+			text.setText(sb.toString());
+			dialog.show();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

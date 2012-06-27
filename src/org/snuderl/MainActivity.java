@@ -69,13 +69,15 @@ public class MainActivity extends ListActivity {
 					int position, long id) {
 
 				NewsMessage m = adapter.getItem(position);
-				api.LoadNews(m);
+				///If content is loaded already, there is no need to load it again, or to report it as a click
+				if (m.Content == null) {
+					api.LoadNews(m);
+
+					AsyncTask<Click, Void, Void> report = new ClickCounter();
+					report.execute(new Click(m.Id, userId));
+				}
 
 				State.getState().selected = m;
-
-				AsyncTask<Click, Void, Void> report = new ClickCounter();
-				report.execute(new Click(m.Id, userId));
-
 				Intent details = new Intent(MainActivity.this,
 						DetailsActivity.class);
 				startActivity(details);
