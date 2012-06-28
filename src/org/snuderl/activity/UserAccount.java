@@ -54,16 +54,12 @@ public class UserAccount extends Activity {
 
 				String response = api.Register(u, p);
 				String text = "";
-				if (response == "Account succesffuly created" || response.equals("Account succesffuly created")) {
-					text = "Registered";
-					response = api.Login(u, p);
-					ApplicationState.SetLoginToken(getApplicationContext(),
-							response, u);
-					notifyChange();
-					UserAccount.this.finish();
-				} else {
-					text = "Failed.";
-				}
+				text = "Registered";
+				response = api.Login(u, p);
+				ApplicationState.SetLoginToken(getApplicationContext(),
+						response, u);
+				notifyChange();
+				UserAccount.this.finish();
 				Toast.makeText(getApplicationContext(), text,
 						Toast.LENGTH_SHORT).show();
 			}

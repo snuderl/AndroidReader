@@ -19,6 +19,8 @@ import android.net.*;
 import android.content.*;
 
 public class TabWidget extends TabActivity {
+	
+
 
 	private boolean isNetworkAvailable() {
 		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);

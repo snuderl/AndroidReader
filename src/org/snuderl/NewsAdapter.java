@@ -27,8 +27,6 @@ public class NewsAdapter extends ArrayAdapter<NewsMessage> {
 	private final Context context;
 	private final List<NewsMessage> values;
 
-	private List<NewsMessage> news;
-
 	public NewsAdapter(Context context, List<NewsMessage> values) {
 		super(context, R.layout.row, values);
 		this.context = context;
@@ -77,8 +75,8 @@ public class NewsAdapter extends ArrayAdapter<NewsMessage> {
 		this.sort(new Comparator<NewsMessage>() {
 
 			public int compare(NewsMessage lhs, NewsMessage rhs) {
-				long ld =toMiliSeconds(lhs.Date);
-				long rd =toMiliSeconds(rhs.Date);
+				long ld = toMiliSeconds(lhs.Date);
+				long rd = toMiliSeconds(rhs.Date);
 				if (ld > rd)
 					return 1;
 				if (rd < ld)
@@ -87,16 +85,24 @@ public class NewsAdapter extends ArrayAdapter<NewsMessage> {
 			}
 		});
 	}
-	
-    public static Long toMiliSeconds(final String iso8601string){
-        String s = iso8601string.substring(0, iso8601string.length()-2);
-        Date date=null;
+
+	public static Long toMiliSeconds(final String iso8601string) {
+		String s = iso8601string.substring(0, iso8601string.length() - 2);
+		Date date = null;
 		try {
 			date = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss").parse(s);
 		} catch (java.text.ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        return date.getTime();
-    }
+		return date.getTime();
+	}
+
+	public void AddRange(List<NewsMessage> list) {
+		for (NewsMessage m : list) {
+			this.add(m);
+		}
+		Sort();
+		notifyDataSetChanged();
+	}
 }

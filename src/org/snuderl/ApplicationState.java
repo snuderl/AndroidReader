@@ -10,6 +10,7 @@ import java.util.Map;
 import org.snuderl.activity.UserChanged;
 import org.snuderl.mobilni.Category;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -18,14 +19,28 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 
-public class ApplicationState {
-	public Category[] Categories;
-	private Map<String, String> ChildToParent = null;
-	public Location Location = null;
-	
+public class ApplicationState extends Application {
+	public static Category[] Categories;
+	private static Map<String, String> ChildToParent = null;
+	public static Location Location = null;
+
 	public static UserChanged change = null;
 
-	public CharSequence[] Categories() {
+	public static boolean isActivityVisible() {
+		return activityVisible;
+	}
+
+	public static void activityResumed() {
+		activityVisible = true;
+	}
+
+	public static void activityPaused() {
+		activityVisible = false;
+	}
+
+	private static boolean activityVisible;
+
+	public static CharSequence[] Categories() {
 		CharSequence[] sequence = new CharSequence[Categories.length];
 		for (int i = 0; i < Categories.length; i++) {
 			sequence[i] = Categories[i].Name;
@@ -35,7 +50,8 @@ public class ApplicationState {
 
 	private static ApplicationState singleton = null;
 
-	private ApplicationState() {	}
+	public ApplicationState() {
+	}
 
 	public static ApplicationState GetApplicationState() {
 		if (singleton == null)
@@ -46,8 +62,8 @@ public class ApplicationState {
 	public String GetParent(String child) {
 		if (ChildToParent == null) {
 			ChildToParent = new LinkedHashMap<String, String>();
-			for (Category p :Categories ) {
-				for(Category c : p.Children){
+			for (Category p : Categories) {
+				for (Category c : p.Children) {
 					ChildToParent.put(c.Name, p.Name);
 				}
 			}
@@ -55,25 +71,25 @@ public class ApplicationState {
 
 		return ChildToParent.get(child);
 	}
-	
-	public static String GetLoginToken(Context c){
-		
+
+	public static String GetLoginToken(Context c) {
+
 		SharedPreferences settings = c.getSharedPreferences(
 				"org.snuderl.settings", 2);
 		String token = settings.getString("token", null);
 		return token;
 	}
-	
-	public static String GetUsername(Context c){
-		
+
+	public static String GetUsername(Context c) {
+
 		SharedPreferences settings = c.getSharedPreferences(
 				"org.snuderl.settings", 2);
 		String token = settings.getString("username", null);
 		return token;
 	}
-	
-	public static void SetLoginToken(Context c, String token,String username){
-		
+
+	public static void SetLoginToken(Context c, String token, String username) {
+
 		SharedPreferences settings = c.getSharedPreferences(
 				"org.snuderl.settings", 2);
 		Editor t = settings.edit();
@@ -81,6 +97,5 @@ public class ApplicationState {
 		t.putString("username", username);
 		t.commit();
 	}
-	
-	
+
 }

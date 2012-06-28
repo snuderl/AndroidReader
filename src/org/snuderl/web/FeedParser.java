@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,7 +36,8 @@ public class FeedParser {
 	private String firstDate = null;
 	private ApplicationState state;
 	private String location = "";
-	public List<String> FilterInfo = null;
+	public String FilterInfo = null;
+	public HashSet<String> Categories = new HashSet<String>();
 
 	private List<String> FilterInfo(String s) {
 		List<String> filters = new LinkedList<String>();
@@ -100,12 +102,41 @@ public class FeedParser {
 		}
 		url.append(location);
 
-		List<NewsMessage> list = parse(url.toString());
+		List<NewsMessage> list = parse(url.toString().replace("\n", ""));
 		if (list.size() > 0) {
 			firstDate = list.get(0).Date;
 		}
 
 		return list;
+	}
+
+	public boolean HasNew() {
+		StringBuilder url = new StringBuilder();
+		url.append(feedUrl);
+		url.append("/" + "GetNew");
+		url.append("?");
+		int count = 0;
+		for (String key : parameters.keySet()) {
+			url.append(key);
+			url.append("=");
+			url.append(parameters.get(key));
+			count++;
+			if (count < parameters.size()) {
+				url.append("&");
+			}
+		}
+		if (firstDate != null) {
+			url.append("&firstDate=" + URLEncoder.encode(firstDate));
+		}
+		url.append(location);
+		
+		try{
+		List<NewsMessage> list = parse(url.toString().replace("\n", ""));
+		return list.size() > 0;
+		}
+		catch(Exception e){
+			return false;
+		}
 	}
 
 	public List<NewsMessage> more() {
@@ -165,7 +196,7 @@ public class FeedParser {
 				new EndTextElementListener() {
 
 					public void end(String body) {
-						FilterInfo = FilterInfo(body);
+						FilterInfo = body;
 
 					}
 				});
@@ -212,6 +243,7 @@ public class FeedParser {
 
 					public void end(String body) {
 						currentMessage.Category = (body);
+						Categories.add(body);
 					}
 				});
 		try {
