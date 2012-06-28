@@ -36,17 +36,15 @@ public class FeedParser {
 	private ApplicationState state;
 	private String location = "";
 	public List<String> FilterInfo = null;
-	
-	private List<String> FilterInfo(String s){
-		List<String> filters = new LinkedList<String>();		
+
+	private List<String> FilterInfo(String s) {
+		List<String> filters = new LinkedList<String>();
 		String[] m = s.split("\n");
-		for(String a : m){
-			if(a!=m[0]){
-				filters.add(a);
-			}
+		for (String a : m) {
+			filters.add(a);
 		}
 		return filters;
-		
+
 	}
 
 	final String feedUrl;
@@ -55,8 +53,8 @@ public class FeedParser {
 	public FeedParser(String feedUrl) {
 		this.feedUrl = feedUrl;
 		state = ApplicationState.GetApplicationState();
-		location=SendCoordinates();
-		
+		location = SendCoordinates();
+
 	}
 
 	public void AddParameter(String key, String value) {
@@ -70,10 +68,10 @@ public class FeedParser {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	private String SendCoordinates(){
+
+	private String SendCoordinates() {
 		StringBuilder url = new StringBuilder();
-		if(state.Location!=null){
+		if (state.Location != null) {
 			url.append("&Longitude=");
 			url.append(state.Location.getLongitude());
 			url.append("&Latitude=");
@@ -128,9 +126,8 @@ public class FeedParser {
 			url.append("&lastDate=" + URLEncoder.encode(lastDate));
 		}
 		url.append(location);
-		
-		List<NewsMessage> list = parse(url.toString().replace("\n", ""));
 
+		List<NewsMessage> list = parse(url.toString().replace("\n", ""));
 
 		return list;
 	}
@@ -164,13 +161,14 @@ public class FeedParser {
 		final NewsMessage currentMessage = new NewsMessage();
 		RootElement root = new RootElement("rss");
 		Element channel = root.getChild("channel");
-		channel.getChild("description").setEndTextElementListener(new EndTextElementListener() {
-			
-			public void end(String body) {
-				FilterInfo = FilterInfo(body);
-				
-			}
-		});
+		channel.getChild("description").setEndTextElementListener(
+				new EndTextElementListener() {
+
+					public void end(String body) {
+						FilterInfo = FilterInfo(body);
+
+					}
+				});
 		Element item = channel.getChild(ITEM);
 		item.setEndElementListener(new EndElementListener() {
 			public void end() {
