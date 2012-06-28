@@ -1,4 +1,4 @@
-package org.snuderl;
+package org.snuderl.mobilni;
 
 import java.util.List;
 

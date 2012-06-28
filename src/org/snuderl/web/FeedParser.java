@@ -1,4 +1,4 @@
-package org.snuderl;
+package org.snuderl.web;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +11,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.snuderl.ApplicationState;
+import org.snuderl.mobilni.NewsMessage;
 
 import android.sax.Element;
 import android.sax.EndElementListener;
@@ -30,7 +33,6 @@ public class FeedParser {
 	static final String CATEGORY = "category";
 	private String lastDate = null;
 	private String firstDate = null;
-	private int page = 0;
 	private ApplicationState state;
 	private String location = "";
 	public List<String> FilterInfo = null;
@@ -50,7 +52,7 @@ public class FeedParser {
 	final String feedUrl;
 	HashMap<String, String> parameters = new HashMap<String, String>();
 
-	protected FeedParser(String feedUrl) {
+	public FeedParser(String feedUrl) {
 		this.feedUrl = feedUrl;
 		state = ApplicationState.GetApplicationState();
 		location=SendCoordinates();
@@ -127,7 +129,7 @@ public class FeedParser {
 		}
 		url.append(location);
 		
-		List<NewsMessage> list = parse(url.toString());
+		List<NewsMessage> list = parse(url.toString().replace("\n", ""));
 
 
 		return list;

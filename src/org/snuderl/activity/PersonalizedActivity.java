@@ -1,11 +1,22 @@
-package org.snuderl;
+package org.snuderl.activity;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.snuderl.ApplicationState;
+import org.snuderl.NewsAdapter;
+import org.snuderl.OnEndFetchMore;
+import org.snuderl.R;
+import org.snuderl.State;
+import org.snuderl.R.id;
+import org.snuderl.R.layout;
+import org.snuderl.R.menu;
 import org.snuderl.click.Click;
 import org.snuderl.click.ClickCounter;
+import org.snuderl.mobilni.NewsMessage;
+import org.snuderl.web.FeedParser;
+import org.snuderl.web.PortalApi;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -20,35 +31,38 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class PersonalizedActivity extends ListActivity {
+public class PersonalizedActivity extends ListActivity implements UserChanged, OnScrollListener {
 	FeedParser parser = null;
 	final PortalApi api = new PortalApi();
 	NewsAdapter adapter = null;
-	String userId = "";
 	Boolean all = false;
 	int checked = -1;
+	OnEndFetchMore f ;
 
 	CharSequence[] items;
 	CharSequence[] filters;
 
 	ListView lv;
+	OnEndFetchMore scrollListener;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		userId = getIntent().getExtras().getString("userId");
-		all = getIntent().getExtras().getBoolean("all");
+		
+		ApplicationState.change =  this;
 
 		parser = new FeedParser("http://mobilniportalnovic.apphb.com/feed");
-		parser.AddParameter("userId", userId);
+		parser.AddParameter("token",
+				ApplicationState.GetLoginToken(this.getApplicationContext()));
 
 		List<NewsMessage> list = parser.parse();
 		adapter = new NewsAdapter(this, list);
@@ -56,6 +70,8 @@ public class PersonalizedActivity extends ListActivity {
 		setListAdapter(adapter);
 
 		lv = getListView();
+		scrollListener=new OnEndFetchMore(adapter, parser);
+		lv.setOnScrollListener(this);
 		lv.setTextFilterEnabled(true);
 
 		lv.setOnItemClickListener(new OnItemClickListener() {
@@ -63,18 +79,17 @@ public class PersonalizedActivity extends ListActivity {
 					int position, long id) {
 
 				NewsMessage m = adapter.getItem(position);
-				///If content is loaded already, there is no need to load it again, or to report it as a click
+				// /If content is loaded already, there is no need to load it
+				// again, or to report it as a click
 				if (m.Content == null) {
 					api.LoadNews(m);
 
 					AsyncTask<Click, Void, Void> report = new ClickCounter();
-					report.execute(new Click(m.Id, userId));
+					report.execute(new Click(m.Id, ApplicationState
+							.GetLoginToken(getApplicationContext())));
 				}
 
 				State.getState().selected = m;
-
-				AsyncTask<Click, Void, Void> report = new ClickCounter();
-				report.execute(new Click(m.Id, userId));
 
 				Intent details = new Intent(PersonalizedActivity.this,
 						DetailsActivity.class);
@@ -94,19 +109,9 @@ public class PersonalizedActivity extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.moreButton:
-			for (NewsMessage nm : parser.more()) {
-				adapter.add(nm);
-			}
-			adapter.notifyDataSetChanged();
-			lv.clearTextFilter();
-			if (checked > 0) {
-				lv.setFilterText(filters[checked].toString());
-			}
-			return true;
 		case R.id.settingsButton:
 			Intent i = new Intent(PersonalizedActivity.this,
-					SettingsActivity.class);
+					UserAccount.class);
 			PersonalizedActivity.this.startActivity(i);
 
 			return true;
@@ -145,7 +150,7 @@ public class PersonalizedActivity extends ListActivity {
 			builder.setNegativeButton("Disable filter", new OnClickListener() {
 
 				public void onClick(DialogInterface dialog, int which) {
-					checked=-1;
+					checked = -1;
 					getListView().clearTextFilter();
 					Toast.makeText(PersonalizedActivity.this,
 							"Filtering disabled", Toast.LENGTH_SHORT);
@@ -157,25 +162,25 @@ public class PersonalizedActivity extends ListActivity {
 			return true;
 
 		case R.id.recreate:
-			parser = new FeedParser("http://mobilniportalnovic.apphb.com/feed");
-			parser.AddParameter("userId", userId);
-			
-			adapter.clear();
-			adapter = new NewsAdapter(this, parser.parse());
-			setListAdapter(adapter);
-			lv.setAdapter(adapter);
-			
+			recreate();
+
 			return true;
 		case R.id.info:
 			Dialog dialog = new Dialog(PersonalizedActivity.this);
 
 			dialog.setContentView(R.layout.filters_dialog);
-			dialog.setTitle("Custom Dialog");
+			dialog.setTitle("Personalization info");
+
+			TextView user = (TextView) dialog.findViewById(R.id.user);
+			user.setText(ApplicationState.GetUsername(getApplicationContext()));
+
+			TextView cat = (TextView) dialog.findViewById(R.id.categories);
+			StringBuilder categories = new StringBuilder();
 
 			TextView text = (TextView) dialog.findViewById(R.id.filterInfo);
 			StringBuilder sb = new StringBuilder();
-			for(String s : parser.FilterInfo){
-				sb.append(s+"\n");
+			for (String s : parser.FilterInfo) {
+				sb.append(s + "\n");
 			}
 			text.setText(sb.toString());
 			dialog.show();
@@ -183,5 +188,39 @@ public class PersonalizedActivity extends ListActivity {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	public void recreate() {
+		parser = new FeedParser("http://mobilniportalnovic.apphb.com/feed");
+		parser.AddParameter("token",
+				ApplicationState.GetLoginToken(getApplicationContext()));
+
+		adapter.clear();
+		adapter = new NewsAdapter(this, parser.parse());
+		
+		setListAdapter(adapter);
+		lv.setAdapter(adapter);
+		scrollListener=new OnEndFetchMore(adapter, parser);
+		lv.setOnScrollListener(this);
+	}
+
+	public void onChange() {
+		recreate();
+	}
+
+	public void onScroll(AbsListView view, int firstVisibleItem,
+			int visibleItemCount, int totalItemCount) {
+		scrollListener.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
+
+		lv.clearTextFilter();
+		if (checked > 0) {
+			lv.setFilterText(filters[checked].toString());
+		}
+		
+	}
+
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+		// TODO Auto-generated method stub
+		
 	}
 }

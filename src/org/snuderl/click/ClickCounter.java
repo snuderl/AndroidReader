@@ -1,6 +1,6 @@
 package org.snuderl.click;
 
-import org.snuderl.PortalApi;
+import org.snuderl.web.PortalApi;
 
 import android.os.AsyncTask;
 import android.util.Log;

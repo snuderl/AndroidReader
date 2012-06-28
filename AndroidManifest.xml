@@ -15,7 +15,7 @@
         android:theme="@android:style/Theme.NoTitleBar"
          >
         <activity
-            android:name="TabWidget"
+            android:name=".activity.TabWidget"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,11 +23,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="SettingsActivity"></activity>
-        <activity android:name="DetailsActivity"></activity>
-        <activity android:name=".MainActivity"></activity>
-        <activity android:name="CategoryActivity"></activity>
-        <activity android:name="PersonalizedActivity"></activity>
+        <activity android:name=".activity.UserAccount"></activity>
+        <activity android:name=".activity.SettingsActivity"></activity>
+        <activity android:name=".activity.MainActivity"></activity>
+        <activity android:name=".activity.PersonalizedActivity"></activity>
+        <activity android:name=".activity.DetailsActivity"></activity>
     </application>
 
 </manifest>

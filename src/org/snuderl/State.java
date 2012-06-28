@@ -1,5 +1,8 @@
 package org.snuderl;
 
+import org.snuderl.mobilni.NewsMessage;
+import org.snuderl.web.PortalApi;
+
 public class State {
 
 	public NewsMessage selected = null;

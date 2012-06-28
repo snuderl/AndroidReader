@@ -1,7 +1,13 @@
-package org.snuderl;
+package org.snuderl.activity;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.snuderl.R;
+import org.snuderl.State;
+import org.snuderl.R.id;
+import org.snuderl.R.layout;
+import org.snuderl.mobilni.NewsMessage;
 
 import android.app.Activity;
 import android.content.Context;

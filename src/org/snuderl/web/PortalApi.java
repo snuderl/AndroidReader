@@ -1,10 +1,13 @@
-package org.snuderl;
+package org.snuderl.web;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.json.JSONObject;
+import org.snuderl.ApplicationState;
+import org.snuderl.mobilni.NewsMessage;
+import org.snuderl.web.RestClient.RequestMethod;
 
 import android.location.Location;
 import android.location.LocationListener;
@@ -17,13 +20,13 @@ public class PortalApi {
 	private final ApplicationState state = ApplicationState
 			.GetApplicationState();
 
-	public String ReportClick(String NewsId, String userId) throws Exception {
+	public String ReportClick(String NewsId, String token) throws Exception {
 		RestClient client = new RestClient(host + "/" + Click);
 		client.AddParam("NewsId", NewsId);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date date = new Date();
 		client.AddParam("ClickDate", dateFormat.format(date));
-		client.AddParam("UserId", userId);
+		client.AddParam("token", token);
 		client.AddParam("Location", GetLocation());
 		client.Execute(RestClient.RequestMethod.POST);
 		return client.getResponse();
@@ -75,4 +78,37 @@ public class PortalApi {
 		}
 	}
 
+	public String Register(String username, String password) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(host + "/register");
+		RestClient client = new RestClient(sb.toString());
+		client.AddParam("username", username);
+		client.AddParam("password", password);
+		try {
+			client.Execute(RequestMethod.POST);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		String response = client.getResponse();
+		return response;
+	}
+
+	public String Login(String username, String password) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(host + "/login");
+		RestClient client = new RestClient(sb.toString());
+		client.AddParam("username", username);
+		client.AddParam("password", password);
+		try {
+			client.Execute(RequestMethod.POST);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		String response = client.getResponse();
+		return response;
+	}
 }

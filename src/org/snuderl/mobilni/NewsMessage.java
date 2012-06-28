@@ -1,7 +1,9 @@
-package org.snuderl;
+package org.snuderl.mobilni;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+
+import org.snuderl.ApplicationState;
 
 public class NewsMessage {
 	public String Id;

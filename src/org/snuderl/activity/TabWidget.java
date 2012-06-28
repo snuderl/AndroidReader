@@ -1,4 +1,9 @@
-package org.snuderl;
+package org.snuderl.activity;
+
+import org.snuderl.ApplicationState;
+import org.snuderl.R;
+import org.snuderl.R.layout;
+import org.snuderl.mobilni.Category;
 
 import android.app.TabActivity;
 import android.content.Intent;
@@ -31,7 +36,7 @@ public class TabWidget extends TabActivity {
 		LocationListener locationListener = new LocationListener() {
 			public void onLocationChanged(Location l) {
 				ApplicationState.GetApplicationState().Location = l;
-				
+
 			}
 
 			public void onProviderEnabled(String provider) {
@@ -49,8 +54,8 @@ public class TabWidget extends TabActivity {
 
 		// Register the listener with the Location Manager to receive location
 		// updates
-		locationManager.requestLocationUpdates(
-				LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
+				0, locationListener);
 	}
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -66,33 +71,28 @@ public class TabWidget extends TabActivity {
 		}
 
 		else {
-
-			final SharedPreferences settings = getSharedPreferences(
-					"org.snuderl.settings", 2);
 			final ApplicationState state = ApplicationState
 					.GetApplicationState();
-			
+
+			if (ApplicationState.GetLoginToken(getApplicationContext()) == null) {
+				Intent i = new Intent().setClass(this, UserAccount.class);
+				startActivity(i);
+			}
+
 			RegisterGpsUpdates();
-			
+
 			try {
 				state.Categories = Category.GetCategories();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
-			settings.edit().putString("userId", "0");
-			settings.edit().commit();
-
-			Resources res = getResources(); // Resource object to get Drawables
 			TabHost tabHost = getTabHost(); // The activity TabHost
 			TabHost.TabSpec spec; // Resusable TabSpec for each tab
 			Intent intent; // Reusable Intent for each tab
 
 			// Create an Intent to launch an Activity for the tab (to be reused)
 			intent = new Intent().setClass(this, PersonalizedActivity.class);
-			intent.putExtra("userId", "1");
-			intent.putExtra("all", false);
-
 			// Initialize a TabSpec for each tab and add it to the TabHost
 			spec = tabHost.newTabSpec("personalized")
 					.setIndicator("Personalized").setContent(intent);
@@ -100,8 +100,6 @@ public class TabWidget extends TabActivity {
 
 			// Do the same for the other tabs
 			intent = new Intent().setClass(this, MainActivity.class);
-			intent.putExtra("userId", "1");
-			intent.putExtra("all", true);
 			spec = tabHost.newTabSpec("all").setIndicator("All")
 					.setContent(intent);
 			tabHost.addTab(spec);

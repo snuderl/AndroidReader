@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.snuderl.mobilni.NewsMessage;
+
 import android.content.Context;
 import android.net.ParseException;
 import android.util.Log;
@@ -24,7 +26,6 @@ import android.widget.TextView;
 public class NewsAdapter extends ArrayAdapter<NewsMessage> {
 	private final Context context;
 	private final List<NewsMessage> values;
-	private boolean[] allowedCategories;
 
 	private List<NewsMessage> news;
 

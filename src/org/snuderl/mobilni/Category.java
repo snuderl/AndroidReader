@@ -1,4 +1,4 @@
-package org.snuderl;
+package org.snuderl.mobilni;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -6,7 +6,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.snuderl.RestClient.RequestMethod;
+import org.snuderl.web.RestClient;
+import org.snuderl.web.RestClient.RequestMethod;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

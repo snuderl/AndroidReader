@@ -1,4 +1,4 @@
-package org.snuderl;
+package org.snuderl.activity;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,8 +7,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.snuderl.ApplicationState;
+import org.snuderl.NewsAdapter;
+import org.snuderl.OnEndFetchMore;
+import org.snuderl.R;
+import org.snuderl.State;
+import org.snuderl.R.id;
+import org.snuderl.R.menu;
 import org.snuderl.click.Click;
 import org.snuderl.click.ClickCounter;
+import org.snuderl.mobilni.NewsMessage;
+import org.snuderl.web.FeedParser;
+import org.snuderl.web.PortalApi;
 
 import android.app.*;
 import android.content.Context;
@@ -27,6 +37,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -37,8 +49,6 @@ public class MainActivity extends ListActivity {
 	FeedParser parser = null;
 	final PortalApi api = new PortalApi();
 	NewsAdapter adapter = null;
-	String userId = "";
-	Boolean all = false;
 	int checked = -1;
 
 	CharSequence[] items;
@@ -51,16 +61,15 @@ public class MainActivity extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		userId = getIntent().getExtras().getString("userId");
-		all = getIntent().getExtras().getBoolean("all");
-
 		parser = new FeedParser("http://mobilniportalnovic.apphb.com/feed");
 
 		List<NewsMessage> list = parser.parse();
 		adapter = new NewsAdapter(this, list);
 		setListAdapter(adapter);
 
-		this.getListView().setOnItemClickListener(GetItemClickListener());
+		lv = this.getListView();
+		lv.setOnItemClickListener(GetItemClickListener());
+		lv.setOnScrollListener(new OnEndFetchMore(adapter, parser));
 	}
 
 	public OnItemClickListener GetItemClickListener() {
@@ -69,12 +78,14 @@ public class MainActivity extends ListActivity {
 					int position, long id) {
 
 				NewsMessage m = adapter.getItem(position);
-				///If content is loaded already, there is no need to load it again, or to report it as a click
+				// /If content is loaded already, there is no need to load it
+				// again, or to report it as a click
 				if (m.Content == null) {
 					api.LoadNews(m);
 
 					AsyncTask<Click, Void, Void> report = new ClickCounter();
-					report.execute(new Click(m.Id, userId));
+					report.execute(new Click(m.Id, ApplicationState
+							.GetLoginToken(getApplicationContext())));
 				}
 
 				State.getState().selected = m;
@@ -96,16 +107,9 @@ public class MainActivity extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.moreButton:
-			for (NewsMessage nm : parser.more()) {
-				adapter.add(nm);
-			}
-			adapter.notifyDataSetChanged();
-			return true;
 		case R.id.settingsButton:
-			Intent i = new Intent(MainActivity.this, SettingsActivity.class);
+			Intent i = new Intent(MainActivity.this, UserAccount.class);
 			MainActivity.this.startActivity(i);
-
 			return true;
 		case R.id.choseCategory:
 
