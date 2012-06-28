@@ -111,11 +111,14 @@ public class PersonalizedActivity extends ListActivity implements UserChanged,
 		};
 
 	}
-
+	
 	@Override
-	protected void onDestroy() {
+	protected void onStop() {
 		t.cancel();
+		super.onStop();
+		
 	}
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
