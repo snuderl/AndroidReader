@@ -33,7 +33,7 @@
         </activity>
         <activity android:name=".activity.MainActivity" >
         </activity>
-        <activity android:name=".activity.PersonalizedActivity" >
+        <activity android:name=".activity.PersonalizedActivity" android:launchMode="singleTask">
         </activity>
         <activity android:name=".activity.DetailsActivity" >
         </activity>
