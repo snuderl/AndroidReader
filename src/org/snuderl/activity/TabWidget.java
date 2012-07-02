@@ -32,10 +32,6 @@ public class TabWidget extends TabActivity {
 	}
 
 	public void RegisterGpsUpdates() {
-		// Acquire a reference to the system Location Manager
-
-		// Register the listener with the Location Manager to receive location
-		// updates
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
 				0, locationListener);
 	}
@@ -49,8 +45,7 @@ public class TabWidget extends TabActivity {
 	@Override protected void onResume() {
 		super.onResume();
 		ApplicationState.activityResumed();
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-				0, locationListener);
+		RegisterGpsUpdates();
 	}
 
 	public void Start() {
@@ -60,7 +55,7 @@ public class TabWidget extends TabActivity {
 		// Define a listener that responds to location updates
 		locationListener = new LocationListener() {
 			public void onLocationChanged(Location l) {
-				ApplicationState.GetApplicationState().Location = l;
+				ApplicationState.Location = l;
 
 			}
 
@@ -96,6 +91,8 @@ public class TabWidget extends TabActivity {
 		else {
 			final ApplicationState state = ApplicationState
 					.GetApplicationState();
+			
+
 
 			if (ApplicationState.GetLoginToken(getApplicationContext()) == null) {
 				Intent i = new Intent().setClass(this, UserAccount.class);

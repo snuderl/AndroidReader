@@ -51,9 +51,10 @@ public class FeedActivity extends ListActivity implements OnItemClickListener,
 			new LoadNewsTask().execute(m);
 
 			AsyncTask<Click, Void, Void> report = new ClickCounter();
-			report.execute(new Click(m.Id, ApplicationState
+			Click c = new Click(m.Id, ApplicationState
 					.GetLoginToken(getApplicationContext()),
-					ApplicationState.GetLocation()));
+					ApplicationState.GetLocation());
+			report.execute(c);
 		} else {
 			ShowNews(m);
 		}
