@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="title">#0e36b9</color>
+    <color name="date">#00ff00</color>
+    <color name="category">#00FF00</color>
+    <color name="white">#0000ff</color>
+    <color name="content">#fffafa</color>
+
+</resources>

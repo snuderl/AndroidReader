@@ -73,7 +73,7 @@ public class FeedParser {
 
 	private String SendCoordinates() {
 		StringBuilder url = new StringBuilder();
-		if (state.Location != null) {
+		if (state.GetLocation() != null) {
 			url.append("&Longitude=");
 			url.append(state.Location.getLongitude());
 			url.append("&Latitude=");

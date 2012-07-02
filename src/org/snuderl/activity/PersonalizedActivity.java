@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.snuderl.ApplicationState;
+import org.snuderl.FeedActivity;
 import org.snuderl.FeedListener;
 import org.snuderl.NewsAdapter;
 import org.snuderl.OnEndFetchMore;
@@ -41,11 +42,7 @@ import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class PersonalizedActivity extends ListActivity implements UserChanged,
-		OnScrollListener, FeedListener {
-	FeedParser parser = null;
-	final PortalApi api = new PortalApi();
-	NewsAdapter adapter = null;
+public class PersonalizedActivity extends FeedActivity {
 	Boolean all = false;
 	int checked = -1;
 	OnEndFetchMore f;
@@ -83,30 +80,9 @@ public class PersonalizedActivity extends ListActivity implements UserChanged,
 
 		lv = getListView();
 		scrollListener = new OnEndFetchMore(this);
-		lv.setOnScrollListener(this);
+		lv.setOnScrollListener(scrollListener);
 
-		lv.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-
-				NewsMessage m = adapter.getItem(position);
-				// /If content is loaded already, there is no need to load it
-				// again, or to report it as a click
-				if (m.Content == null) {
-					api.LoadNews(m);
-
-					AsyncTask<Click, Void, Void> report = new ClickCounter();
-					report.execute(new Click(m.Id, ApplicationState
-							.GetLoginToken(getApplicationContext()), ApplicationState.Location));
-				}
-
-				State.getState().selected = m;
-
-				Intent details = new Intent(PersonalizedActivity.this,
-						DetailsActivity.class);
-				startActivity(details);
-			}
-		});
+		lv.setOnItemClickListener(this);
 		t = new Timer();
 		t.scheduleAtFixedRate(new FetchNew(), 5000, 5000);
 
@@ -198,24 +174,6 @@ public class PersonalizedActivity extends ListActivity implements UserChanged,
 		lv.setAdapter(adapter);
 	}
 
-	public void onChange() {
-		recreate();
-	}
-
-	public void onScroll(AbsListView view, int firstVisibleItem,
-			int visibleItemCount, int totalItemCount) {
-		scrollListener.onScroll(view, firstVisibleItem, visibleItemCount,
-				totalItemCount);
-
-	}
-
-	public void onScrollStateChanged(AbsListView view, int scrollState) {
-		// TODO Auto-generated method stub
-
-	}
-
-
-
 	public void displayNotification(String msg) {
 		NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		Notification notification = new Notification(R.drawable.ic_launcher,
@@ -259,18 +217,4 @@ public class PersonalizedActivity extends ListActivity implements UserChanged,
 
 		}
 	}
-
-	public FeedParser getParser() {
-		return this.parser;
-	}
-
-	public NewsAdapter getAdapter() {
-		return this.adapter;
-	}
-
-	public ListView getLV() {
-		// TODO Auto-generated method stub
-		return this.lv;
-	}
-
 }

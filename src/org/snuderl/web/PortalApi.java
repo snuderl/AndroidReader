@@ -38,7 +38,7 @@ public class PortalApi {
 	}
 
 	public String GetLocation() {
-		Location l = state.Location;
+		Location l = state.GetLocation();
 		String s;
 		if (l == null) {
 			s = "null";

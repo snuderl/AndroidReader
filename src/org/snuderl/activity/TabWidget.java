@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.widget.TabHost;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.location.Location;
 import android.location.LocationListener;
@@ -110,6 +111,7 @@ public class TabWidget extends TabActivity {
 				e.printStackTrace();
 			}
 			TabHost tabHost = getTabHost(); // The activity TabHost
+			
 			TabHost.TabSpec spec; // Resusable TabSpec for each tab
 			Intent intent; // Reusable Intent for each tab
 
@@ -119,12 +121,15 @@ public class TabWidget extends TabActivity {
 			spec = tabHost.newTabSpec("personalized")
 					.setIndicator("Personalized").setContent(intent);
 			tabHost.addTab(spec);
+			
 
 			// Do the same for the other tabs
 			intent = new Intent().setClass(this, MainActivity.class);
 			spec = tabHost.newTabSpec("all").setIndicator("All")
 					.setContent(intent);
 			tabHost.addTab(spec);
+			
+			
 
 			tabHost.setCurrentTab(0);
 		}

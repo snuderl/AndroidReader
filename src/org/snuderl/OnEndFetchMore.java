@@ -5,14 +5,16 @@ import java.util.List;
 import org.snuderl.mobilni.NewsMessage;
 import org.snuderl.web.FeedParser;
 
+import android.os.AsyncTask;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 
 public class OnEndFetchMore implements OnScrollListener {
-	FeedListener fl;
+	FeedActivity fl;
 	private boolean hasMore = true;
+	private boolean loading = false;
 
-	public OnEndFetchMore(FeedListener fl) {
+	public OnEndFetchMore(FeedActivity fl) {
 		this.fl = fl;
 	}
 
@@ -21,22 +23,38 @@ public class OnEndFetchMore implements OnScrollListener {
 
 		boolean loadMore = firstVisibleItem + visibleItemCount >= totalItemCount;
 		if (loadMore && hasMore) {
-			List<NewsMessage> list = fl.getParser().more();
-			for (NewsMessage m : list) {
-				fl.getAdapter().add(m);
+			if (loading == false) {
+				loading = true;
+				new LoadMoreTask().execute();
 			}
-			fl.getAdapter().notifyDataSetChanged();
-
-			if (list.size() == 0) {
-				hasMore = false;
-			}
-			
-
 		}
 
 	}
 
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+	}
+
+	class LoadMoreTask extends AsyncTask<Void, Void, List<NewsMessage>> {
+
+		@Override
+		protected List<NewsMessage> doInBackground(Void... params) {
+			return fl.parser.more();
+		}
+
+		@Override
+		protected void onPostExecute(List<NewsMessage> news) {
+			for (NewsMessage m : news) {
+				fl.adapter.add(m);
+			}
+			fl.adapter.notifyDataSetChanged();
+
+			if (news.size() == 0) {
+				hasMore = false;
+			}
+			loading = false;
+			super.onPostExecute(news);
+		}
 
 	}
 

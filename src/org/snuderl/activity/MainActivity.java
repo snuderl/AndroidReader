@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.snuderl.ApplicationState;
+import org.snuderl.FeedActivity;
 import org.snuderl.FeedListener;
 import org.snuderl.NewsAdapter;
 import org.snuderl.OnEndFetchMore;
@@ -46,10 +47,7 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
-public class MainActivity extends ListActivity implements FeedListener {
-	FeedParser parser = null;
-	final PortalApi api = new PortalApi();
-	NewsAdapter adapter = null;
+public class MainActivity extends FeedActivity {
 	int checked = -1;
 
 	CharSequence[] items;
@@ -69,32 +67,8 @@ public class MainActivity extends ListActivity implements FeedListener {
 		setListAdapter(adapter);
 
 		lv = this.getListView();
-		lv.setOnItemClickListener(GetItemClickListener());
+		lv.setOnItemClickListener(this);
 		lv.setOnScrollListener(new OnEndFetchMore(this));
-	}
-
-	public OnItemClickListener GetItemClickListener() {
-		return new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-
-				NewsMessage m = adapter.getItem(position);
-				// /If content is loaded already, there is no need to load it
-				// again, or to report it as a click
-				if (m.Content == null) {
-					api.LoadNews(m);
-
-					AsyncTask<Click, Void, Void> report = new ClickCounter();
-					report.execute(new Click(m.Id, ApplicationState
-							.GetLoginToken(getApplicationContext()), ApplicationState.Location));
-				}
-
-				State.getState().selected = m;
-				Intent details = new Intent(MainActivity.this,
-						DetailsActivity.class);
-				startActivity(details);
-			}
-		};
 	}
 
 	@Override
@@ -114,7 +88,7 @@ public class MainActivity extends ListActivity implements FeedListener {
 			return true;
 		case R.id.choseCategory:
 
-			items = ApplicationState.GetApplicationState().Categories();
+			items = ApplicationState.Categories();
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("Choose category:");
 			builder.setSingleChoiceItems(items, checked, new OnClickListener() {
@@ -135,7 +109,7 @@ public class MainActivity extends ListActivity implements FeedListener {
 						adapter.add(nm);
 					}
 					adapter.notifyDataSetChanged();
-					getLV().setSelectionAfterHeaderView();
+					lv.setSelectionAfterHeaderView();
 				}
 			});
 			builder.setNegativeButton("Show all", new OnClickListener() {
@@ -148,7 +122,7 @@ public class MainActivity extends ListActivity implements FeedListener {
 						adapter.add(nm);
 					}
 					adapter.notifyDataSetChanged();
-					getLV().setSelectionAfterHeaderView();
+					lv.setSelectionAfterHeaderView();
 					Toast.makeText(MainActivity.this, "Displaying all",
 							Toast.LENGTH_SHORT);
 				}
@@ -160,18 +134,5 @@ public class MainActivity extends ListActivity implements FeedListener {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
-	}
-
-	public FeedParser getParser() {
-		return this.parser;
-	}
-
-	public NewsAdapter getAdapter() {
-		return this.adapter;
-	}
-	
-	public ListView getLV() {
-		// TODO Auto-generated method stub
-		return this.lv;
 	}
 }

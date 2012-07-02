@@ -23,6 +23,12 @@ public class ApplicationState extends Application {
 	public static Category[] Categories;
 	private static Map<String, String> ChildToParent = null;
 	public static Location Location = null;
+	
+	public static Location GetLocation(){
+		if(Location==null || (Location.getLatitude()==0 && Location.getLongitude()==0))
+			return null;
+		return Location;
+	}
 
 	public static UserChanged change = null;
 

@@ -3,12 +3,14 @@
     android:id="@+id/scrollView1"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="@android:color/black"
     android:layout_alignParentLeft="true" >
 
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+         >
 
         <TextView
             android:id="@+id/detailsTitle"
@@ -18,7 +20,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:text="TextView"
-            android:textColor="#0e36b9"
+            android:textColor="@color/title"
             android:textSize="19sp" />
 
         <TextView
@@ -27,6 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/detailsTitle"
+            android:textColor="@color/date"
             android:text="TextViewfggfggf"
             android:textSize="10sp" />
 
@@ -37,7 +40,7 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/detailsTitle"
             android:text="TextViewfggfggf"
-            android:textColor="#00FF00"
+            android:textColor="@color/category"
             android:textSize="10sp" />
 
         <WebView
