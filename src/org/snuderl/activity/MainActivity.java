@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.snuderl.ApplicationState;
+import org.snuderl.FeedListener;
 import org.snuderl.NewsAdapter;
 import org.snuderl.OnEndFetchMore;
 import org.snuderl.R;
@@ -45,7 +46,7 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
-public class MainActivity extends ListActivity {
+public class MainActivity extends ListActivity implements FeedListener {
 	FeedParser parser = null;
 	final PortalApi api = new PortalApi();
 	NewsAdapter adapter = null;
@@ -69,7 +70,7 @@ public class MainActivity extends ListActivity {
 
 		lv = this.getListView();
 		lv.setOnItemClickListener(GetItemClickListener());
-		lv.setOnScrollListener(new OnEndFetchMore(adapter, parser));
+		lv.setOnScrollListener(new OnEndFetchMore(this));
 	}
 
 	public OnItemClickListener GetItemClickListener() {
@@ -85,7 +86,7 @@ public class MainActivity extends ListActivity {
 
 					AsyncTask<Click, Void, Void> report = new ClickCounter();
 					report.execute(new Click(m.Id, ApplicationState
-							.GetLoginToken(getApplicationContext())));
+							.GetLoginToken(getApplicationContext()), ApplicationState.Location));
 				}
 
 				State.getState().selected = m;
@@ -133,6 +134,8 @@ public class MainActivity extends ListActivity {
 					for (NewsMessage nm : parser.parse()) {
 						adapter.add(nm);
 					}
+					adapter.notifyDataSetChanged();
+					getLV().setSelectionAfterHeaderView();
 				}
 			});
 			builder.setNegativeButton("Show all", new OnClickListener() {
@@ -144,6 +147,8 @@ public class MainActivity extends ListActivity {
 					for (NewsMessage nm : parser.parse()) {
 						adapter.add(nm);
 					}
+					adapter.notifyDataSetChanged();
+					getLV().setSelectionAfterHeaderView();
 					Toast.makeText(MainActivity.this, "Displaying all",
 							Toast.LENGTH_SHORT);
 				}
@@ -155,5 +160,18 @@ public class MainActivity extends ListActivity {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	public FeedParser getParser() {
+		return this.parser;
+	}
+
+	public NewsAdapter getAdapter() {
+		return this.adapter;
+	}
+	
+	public ListView getLV() {
+		// TODO Auto-generated method stub
+		return this.lv;
 	}
 }

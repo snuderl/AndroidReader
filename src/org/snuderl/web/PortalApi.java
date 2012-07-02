@@ -20,14 +20,19 @@ public class PortalApi {
 	private final ApplicationState state = ApplicationState
 			.GetApplicationState();
 
-	public String ReportClick(String NewsId, String token) throws Exception {
+	public String ReportClick(org.snuderl.click.Click click) throws Exception {
 		RestClient client = new RestClient(host + "/" + Click);
-		client.AddParam("NewsId", NewsId);
+		client.AddParam("NewsId", click.id);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date date = new Date();
 		client.AddParam("ClickDate", dateFormat.format(date));
-		client.AddParam("token", token);
-		client.AddParam("Location", GetLocation());
+		client.AddParam("token", click.token);
+		if (click.location != null) {
+			client.AddParam("Longitude",
+					Double.toString(click.location.getLongitude()));
+			client.AddParam("Latitude",
+					Double.toString(click.location.getLatitude()));
+		}
 		client.Execute(RestClient.RequestMethod.POST);
 		return client.getResponse();
 	}

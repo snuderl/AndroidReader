@@ -178,7 +178,7 @@ public class FeedParser {
 			}
 		}
 		url.append(location);
-		List<NewsMessage> list = parse(url.toString());
+		List<NewsMessage> list = parse(url.toString().replace("\n", ""));
 		if (list.size() > 0) {
 			firstDate = list.get(0).Date;
 		}

@@ -1,11 +1,16 @@
 package org.snuderl.click;
 
-public class Click {
-	String id;
-	String userId;
+import android.location.Location;
+import android.location.LocationListener;
 
-	public Click(String id, String userId) {
+public class Click {
+	public String id;
+	public String token;
+	public Location location;
+
+	public Click(String id, String token, Location location) {
 		this.id = id;
-		this.userId = userId;
+		this.token = token;
+		this.location=location;
 	}
 }

@@ -19,8 +19,9 @@ import android.net.*;
 import android.content.*;
 
 public class TabWidget extends TabActivity {
-	
 
+	LocationListener locationListener;
+	LocationManager locationManager;
 
 	private boolean isNetworkAvailable() {
 		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -31,11 +32,32 @@ public class TabWidget extends TabActivity {
 
 	public void RegisterGpsUpdates() {
 		// Acquire a reference to the system Location Manager
-		LocationManager locationManager = (LocationManager) this
+
+		// Register the listener with the Location Manager to receive location
+		// updates
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
+				0, locationListener);
+	}
+	
+	@Override protected void onPause() {
+		super.onPause();
+		ApplicationState.activityPaused();
+		locationManager.removeUpdates(locationListener);
+	}
+	
+	@Override protected void onResume() {
+		super.onResume();
+		ApplicationState.activityResumed();
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
+				0, locationListener);
+	}
+
+	public void Start() {
+		locationManager = (LocationManager) this
 				.getSystemService(Context.LOCATION_SERVICE);
 
 		// Define a listener that responds to location updates
-		LocationListener locationListener = new LocationListener() {
+		locationListener = new LocationListener() {
 			public void onLocationChanged(Location l) {
 				ApplicationState.GetApplicationState().Location = l;
 
@@ -54,11 +76,9 @@ public class TabWidget extends TabActivity {
 			}
 		};
 
-		// Register the listener with the Location Manager to receive location
-		// updates
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-				0, locationListener);
 	}
+	
+	
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -81,6 +101,7 @@ public class TabWidget extends TabActivity {
 				startActivity(i);
 			}
 
+			Start();
 			RegisterGpsUpdates();
 
 			try {
@@ -88,7 +109,6 @@ public class TabWidget extends TabActivity {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
 			TabHost tabHost = getTabHost(); // The activity TabHost
 			TabHost.TabSpec spec; // Resusable TabSpec for each tab
 			Intent intent; // Reusable Intent for each tab

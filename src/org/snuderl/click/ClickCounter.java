@@ -11,7 +11,7 @@ public class ClickCounter extends AsyncTask<Click, Void, Void> {
 	protected Void doInBackground(Click... params) {
 		PortalApi api = new PortalApi();
 		try {
-			String response = api.ReportClick(params[0].id, params[0].userId);
+			String response = api.ReportClick(params[0]);
 			Log.d("Click response", response);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.snuderl.ApplicationState;
+import org.snuderl.FeedListener;
 import org.snuderl.NewsAdapter;
 import org.snuderl.OnEndFetchMore;
 import org.snuderl.R;
@@ -41,7 +42,7 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class PersonalizedActivity extends ListActivity implements UserChanged,
-		OnScrollListener {
+		OnScrollListener, FeedListener {
 	FeedParser parser = null;
 	final PortalApi api = new PortalApi();
 	NewsAdapter adapter = null;
@@ -67,16 +68,21 @@ public class PersonalizedActivity extends ListActivity implements UserChanged,
 		ApplicationState.change = this;
 
 		parser = new FeedParser("http://mobilniportalnovic.apphb.com/feed");
-		parser.AddParameter("token",
-				ApplicationState.GetLoginToken(this.getApplicationContext()));
+		List<NewsMessage> list;
+		if (ApplicationState.GetLoginToken(getApplicationContext()) != null) {
+			parser.AddParameter("token", ApplicationState.GetLoginToken(this
+					.getApplicationContext()));
 
-		List<NewsMessage> list = parser.parse();
+			list = parser.parse();
+		} else {
+			list = new ArrayList<NewsMessage>();
+		}
 		adapter = new NewsAdapter(this, list);
 		adapter.Sort();
 		setListAdapter(adapter);
 
 		lv = getListView();
-		scrollListener = new OnEndFetchMore(adapter, parser);
+		scrollListener = new OnEndFetchMore(this);
 		lv.setOnScrollListener(this);
 
 		lv.setOnItemClickListener(new OnItemClickListener() {
@@ -91,7 +97,7 @@ public class PersonalizedActivity extends ListActivity implements UserChanged,
 
 					AsyncTask<Click, Void, Void> report = new ClickCounter();
 					report.execute(new Click(m.Id, ApplicationState
-							.GetLoginToken(getApplicationContext())));
+							.GetLoginToken(getApplicationContext()), ApplicationState.Location));
 				}
 
 				State.getState().selected = m;
@@ -111,14 +117,13 @@ public class PersonalizedActivity extends ListActivity implements UserChanged,
 		};
 
 	}
-	
-	@Override
-	protected void onStop() {
-		t.cancel();
-		super.onStop();
-		
-	}
 
+	@Override
+	protected void onDestroy() {
+		t.cancel();
+		super.onDestroy();
+
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -146,53 +151,6 @@ public class PersonalizedActivity extends ListActivity implements UserChanged,
 			PersonalizedActivity.this.startActivity(i);
 
 			return true;
-			// case R.id.choseCategory:
-			// if (!all) {
-			// LinkedHashMap<String, Integer> map = adapter.GetCategories();
-			// List<String> tmp = new ArrayList<String>();
-			// for (String key : map.keySet()) {
-			// tmp.add(key + " (" + map.get(key) + ")");
-			// }
-			// items = new String[map.size()];
-			// filters = new String[map.size()];
-			// tmp.toArray(items);
-			// map.keySet().toArray(filters);
-			// } else {
-			// items = ApplicationState.GetApplicationState().Categories();
-			// filters = items;
-			// }
-			// AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			// builder.setTitle("Pick a color");
-			// builder.setSingleChoiceItems(items, checked, new
-			// OnClickListener() {
-			//
-			// public void onClick(DialogInterface dialog, int which) {
-			// checked = which;
-			// }
-			// });
-			// builder.setPositiveButton("Filter", new OnClickListener() {
-			//
-			// public void onClick(DialogInterface dialog, int which) {
-			//
-			// dialog.cancel();
-			// getListView().setFilterText(filters[checked].toString());
-			// getListView().setTextFilterEnabled(true);
-			// }
-			// });
-			// builder.setNegativeButton("Disable filter", new OnClickListener()
-			// {
-			//
-			// public void onClick(DialogInterface dialog, int which) {
-			// checked = -1;
-			// getListView().clearTextFilter();
-			// Toast.makeText(PersonalizedActivity.this,
-			// "Filtering disabled", Toast.LENGTH_SHORT);
-			// }
-			// });
-			// AlertDialog alert = builder.create();
-			// alert.show();
-			//
-			// return true;
 
 		case R.id.recreate:
 			recreate();
@@ -238,8 +196,6 @@ public class PersonalizedActivity extends ListActivity implements UserChanged,
 
 		setListAdapter(adapter);
 		lv.setAdapter(adapter);
-		scrollListener = new OnEndFetchMore(adapter, parser);
-		lv.setOnScrollListener(this);
 	}
 
 	public void onChange() {
@@ -258,17 +214,7 @@ public class PersonalizedActivity extends ListActivity implements UserChanged,
 
 	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		ApplicationState.activityResumed();
-	}
 
-	@Override
-	protected void onPause() {
-		super.onPause();
-		ApplicationState.activityPaused();
-	}
 
 	public void displayNotification(String msg) {
 		NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -277,34 +223,54 @@ public class PersonalizedActivity extends ListActivity implements UserChanged,
 
 		// The PendingIntent will launch activity if the user selects this
 		// notification
+		Intent NotificationIntent = new Intent(this, TabWidget.class);
+		NotificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+				| Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		NotificationIntent.setAction(Intent.ACTION_MAIN);
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 1,
-				new Intent(this, TabWidget.class), 0);
+				NotificationIntent, 0);
 
-		notification.setLatestEventInfo(this, "Title here",
-				".. And here's some more details..", contentIntent);
+		notification.setLatestEventInfo(this, "Novice",
+				"Na vašem kanalu so na voljo nove novice.", contentIntent);
 
 		manager.notify(2, notification);
 
 	}
-	
+
 	public PendingIntent existAlarm(int id) {
-		  Intent intent = new Intent(this, TabWidget.class);
-		  intent.setAction(Intent.ACTION_VIEW);
-		  PendingIntent test = PendingIntent.getBroadcast(this, id
-		    + 0, intent, PendingIntent.FLAG_NO_CREATE);
-		  return test;
-		 }
+		Intent intent = new Intent(this, TabWidget.class);
+		intent.setAction(Intent.ACTION_VIEW);
+		PendingIntent test = PendingIntent.getBroadcast(this, id + 0, intent,
+				PendingIntent.FLAG_NO_CREATE);
+		return test;
+	}
 
 	private class FetchNew extends TimerTask {
 
 		public void run() {
-			if (parser.HasNew() && existAlarm(1)==null) {
-				if (ApplicationState.isActivityVisible() == false) {
-					displayNotification("new");
-					handler.sendMessage(new Message());
+			if (ApplicationState.GetLoginToken(getApplicationContext()) != null) {
+				if (parser.HasNew() && existAlarm(1) == null) {
+					if (ApplicationState.isActivityVisible() == false) {
+						displayNotification("New news");
+						handler.sendMessage(new Message());
+					}
 				}
 			}
 
 		}
 	}
+
+	public FeedParser getParser() {
+		return this.parser;
+	}
+
+	public NewsAdapter getAdapter() {
+		return this.adapter;
+	}
+
+	public ListView getLV() {
+		// TODO Auto-generated method stub
+		return this.lv;
+	}
+
 }
