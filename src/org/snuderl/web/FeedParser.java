@@ -215,7 +215,7 @@ public class FeedParser {
 		item.getChild(TITLE).setEndTextElementListener(
 				new EndTextElementListener() {
 					public void end(String body) {
-						currentMessage.Title = (body);
+						currentMessage.Title = (body).toUpperCase();
 					}
 				});
 		item.getChild(LINK).setEndTextElementListener(
