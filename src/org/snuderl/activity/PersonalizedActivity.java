@@ -178,6 +178,7 @@ public class PersonalizedActivity extends FeedActivity {
 		NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		Notification notification = new Notification(R.drawable.ic_launcher,
 				msg, System.currentTimeMillis());
+		notification.flags = Notification.FLAG_AUTO_CANCEL;
 
 		// The PendingIntent will launch activity if the user selects this
 		// notification
